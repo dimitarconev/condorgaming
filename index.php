@@ -1,11 +1,22 @@
 <?php
 
-header('Content-Type: application/json');
+require_once __DIR__ . '/../src/SourceInterface.php';
+require_once __DIR__ . '/../src/MatomoAnalytics.php';
+require_once __DIR__ . '/../src/OpenWebAnalytics.php';
+require_once __DIR__ . '/../src/CloudflareAnalytics.php';
+require_once __DIR__ . '/../src/SourceManager.php';
+require_once __DIR__ . '/../src/Response.php';
+require_once __DIR__ . '/../src/Router.php';
 
-$response = [
-    "error" => false,
-    "message" => "API is working",
-    "data" => []
-];
+$router = new Router();
 
-echo json_encode($response);
+$router->add('/stats', function () {
+    $sourceManager = new SourceManager();
+    Response::json([
+        "error" => false,
+        "message" => "Aggregated statistics",
+        "data" => $sourceManager->getAggregatedData()
+    ]);
+});
+
+$router->dispatch($_SERVER['REQUEST_URI']);
